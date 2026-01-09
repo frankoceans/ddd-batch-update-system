@@ -1,0 +1,82 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
+spring:
+  application:
+    name: ddd-batch-update
+  
+  # 数据库配置
+  datasource:
+    url: jdbc:h2:mem:ddd_batch_update
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: password
+  
+  # JPA配置
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        format_sql: true
+  
+  # H2控制台配置
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  
+  # RabbitMQ配置（如果需要）
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+# 日志配置
+logging:
+  level:
+    com.example.ddd.batchupdate: DEBUG
+    org.springframework.web: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/ddd-batch-update.log
+
+# DDD批量更新系统配置
+ddd:
+  batch:
+    max-size: 1000
+    timeout-ms: 30000
+    retry-count: 3
+  transaction:
+    cleanup:
+      enabled: true
+      older-than-days: 30
+  event:
+    async:
+      enabled: true
+      thread-pool-size: 5
+
+# 管理端点配置
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+    metrics:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: false
